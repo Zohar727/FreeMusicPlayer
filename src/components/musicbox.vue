@@ -18,9 +18,9 @@
       </div>
       <div class="control-bar" >
         <div class="loop-btn btn" ></div>
-        <div class="pre-btn btn"></div>
+        <div class="pre-btn btn" @click="preplay"></div>
         <div class="pause-btn btn" :class="{'pause':state>0}" @click="play"></div>
-        <div class="next-btn btn"></div>
+        <div class="next-btn btn" @click="nextplay"></div>
         <div class="volume-btn btn"></div>
       </div>
       <div class="bg">
@@ -51,10 +51,12 @@
               name:"",
               message:"",
               songs:Object,
+              songsList:[],
               songUrl:"",
               startTime:"00:00",
               time:"05:28",
               state:0,
+              index:0,
               originPos:{
                   x:0,
                   y:0
@@ -66,6 +68,8 @@
           search(song,index,songs){
             var self = this;
             this.songs = song;
+            this.index = index;
+            this.songsList = songs;
             console.log("传过来的song:"+song+song.name+song.ar[0].name+song.al.picUrl);
             console.log("传过来的id："+song.id);
             console.log("传过来的index:"+index);
@@ -130,6 +134,39 @@
                 console.log("点击暂停按钮了");
             }
           },
+          preplay(){
+            this.index--;
+            this.switchplay(this.index);
+          },
+          nextplay(){
+            this.index++;
+            this.switchplay(this.index);
+          },
+          switchplay(index){
+              //this.index++;
+              //var index = this.index;
+              var self = this;
+              this.songs = this.songsList[index];
+              axios.get('https://api.imjad.cn/cloudmusic/?id='+this.songsList[index].id)
+                .then( (response) => {
+                  var songItem = JSON.parse(JSON.stringify(response.data));
+                  var url = songItem.data[0].url;
+                  console.log(url);
+                  this.songUrl = url;
+                  setTimeout(function () {
+                    var time = document.getElementById("audio").duration;
+                    //this.methods.controlBar(time);
+                    console.log(time);
+                    self.currentTime(time,0);
+//                  var audio = document.getElementById("audio");
+//                  audio.play();
+                    self.play();
+                  },500);
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+          },
           timeline(){
             var audio = document.getElementById("audio");
             var scales = audio.currentTime/audio.duration;
@@ -142,6 +179,8 @@
              this.currentTime(audio.currentTime,1);
              if(scales==1){
                  this.state = 0;
+                 this.index++;
+                 this.switchplay(this.index);
              }
           },
           currentTime(time,state){
