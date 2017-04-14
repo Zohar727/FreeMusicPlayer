@@ -63,11 +63,13 @@
           }
       },
       methods:{
-          search(song){
+          search(song,index,songs){
             var self = this;
             this.songs = song;
             console.log("传过来的song:"+song+song.name+song.ar[0].name+song.al.picUrl);
             console.log("传过来的id："+song.id);
+            console.log("传过来的index:"+index);
+            console.log("传过来的songs:"+songs.length);
             axios.get('https://api.imjad.cn/cloudmusic/?id='+song.id)
               .then( (response) => {
                 var songItem = JSON.parse(JSON.stringify(response.data));

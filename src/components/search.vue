@@ -9,10 +9,10 @@
       <!--<p>music name is : {{name}}</p>-->
       <div ref="songWrap" class="songWrap">
         <ul class="songList">
-          <li v-for="song in songs" class="songItem" >
+          <li v-for="(song, index) in songs" class="songItem" >
             <p class="songName">{{song.name}}</p>
             <p class="singer">{{song.ar[0].name}}-{{song.al.name}}</p>
-            <span class="songPlay" @click.stop="listPlay(song,$event)"></span>
+            <span class="songPlay" @click.stop="listPlay(song,index,$event)"></span>
           </li>
         </ul>
       </div>
@@ -68,12 +68,13 @@
                     click:true
                 })
             },
-            listPlay(song,event){
+            listPlay(song,index,event){
               if(!event._constructed){
                 return;
               }
                 console.log(song.id);
-                this.$emit('search',song);
+                var songs = this.songs;
+                this.$emit('search',song,index,songs);
             }
         }
     }
