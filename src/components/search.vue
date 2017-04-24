@@ -12,7 +12,7 @@
           <li v-for="(song, index) in songs" class="songItem" >
             <p class="songName">{{song.name}}</p>
             <p class="singer">{{song.ar[0].name}}-{{song.al.name}}</p>
-            <span class="songPlay" @click.stop="listPlay(song,index,$event)"></span>
+            <span class="songPlay" :class="{'pause':pauseIndex == index}" @click.stop="listPlay(song,index,$event)"></span>
           </li>
         </ul>
       </div>
@@ -27,7 +27,8 @@
             return{
                 showFlag:false,
                 name:"",
-                songs:[]
+                songs:[],
+                pauseIndex:-1
             }
         },
         methods:{
@@ -74,6 +75,7 @@
               }
                 console.log(song.id);
                 var songs = this.songs;
+                this.pauseIndex = index;
                 this.$emit('search',song,index,songs);
             }
         }
@@ -179,6 +181,14 @@
     height: 144px;
     background: url("../assets/play.png");
     transform: scale(0.5);
-
+  }
+  .pause{
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 144px;
+    height: 144px;
+    background: url("../assets/pause.png") no-repeat;
+    transform: scale(0.5);
   }
 </style>

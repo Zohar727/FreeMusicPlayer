@@ -154,10 +154,16 @@
                   console.log(url);
                   this.songUrl = url;
                   setTimeout(function () {
-                    var time = document.getElementById("audio").duration;
+                    var audio = document.getElementById("audio");
+
+                    audio.addEventListener('canplay',function () {
+                      var time = audio.duration;
+                      console.log("canplay");
+                      self.currentTime(time,0);
+                    })
                     //this.methods.controlBar(time);
                     console.log(time);
-                    self.currentTime(time,0);
+
 //                  var audio = document.getElementById("audio");
 //                  audio.play();
                     self.play();
