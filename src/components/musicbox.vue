@@ -10,7 +10,7 @@
         <div class="progress-line" ref="progress">
           <span class="line" ref="line"></span>
           <div class="line-slider" ref="lineSlider" @touchstart="touchdown" @touchmove="touchmove"
-               @touchend="touchend">
+               @touchend="touchend" @mousedown="touchdown" @mousemove="touchmove" @mouseup="touchend">
             <span class="line-slider-box" ></span>
           </div>
         </div>
@@ -61,7 +61,8 @@
                   x:0,
                   y:0
               },
-              curProcess:0
+              curProcess:0,
+              mouseFlag:false
           }
       },
       methods:{
@@ -214,16 +215,30 @@
 
           },
           touchdown(){
-            this.originPos.x = event.touches[0].clientX;
-            this.originPos.y = event.touches[0].clientY;
+            this.mouseFlag = true;
+            var touch;
+            if(event.touches){
+              touch = event.touches[0];
+            }else {
+              touch = event;
+            }
+            this.originPos.x = touch.clientX;
+            this.originPos.y = touch.clientY;
             console.log("curX:"+this.originPos.x+",curY:"+this.originPos.x);
           },
           touchmove(){
-            var curleft = event.touches[0].clientX - this.$refs.progress.offsetLeft-this.$refs.progressBar.offsetLeft;
+            if(this.mouseFlag){
+            var touch;
+            if(event.touches){
+              touch = event.touches[0];
+            }else {
+              touch = event;
+            }
+            var curleft = touch.clientX - this.$refs.progress.offsetLeft-this.$refs.progressBar.offsetLeft;
             console.log("progress:"+this.$refs.progress.clientLeft);
             //var curleft = this.$refs.lineSlider.style.left.toString();
-            console.log("left:"+curleft);
-            console.log(event.touches[0].clientX,event.touches[0].clientY);
+            //console.log("left:"+curleft);
+            //console.log(event.touches[0].clientX,event.touches[0].clientY);
             if(curleft>0 && curleft<650){
               this.curProcess  = curleft;
               this.$refs.lineSlider.style.left = curleft + 'px';
@@ -232,8 +247,10 @@
             document.addEventListener("touchmove",function(){
               event.preventDefault();
             },false);
+            }
           },
           touchend(){
+              this.mouseFlag = false;
               var audio = document.getElementById("audio");
               var scales = this.curProcess / this.$refs.progress.offsetWidth ;
               console.log("scales:"+scales);
@@ -300,6 +317,9 @@
     }
 </script>
 <style scoped>
+  .musicbox{
+    width:100%;
+  }
   .goSearch{
     background: url("../assets/search.png") no-repeat;
     width: 64px;
@@ -442,5 +462,78 @@
   }
   .bg img{
     width: 100%;
+  }
+  @media screen and (min-width: 1000px){
+    *{
+      font-size: 12px;
+    }
+    html{
+      background: #d2d5d6;
+    }
+    #musicbox{
+      width: 35%;
+      height:55%;
+      background-color: #fff;
+      border-radius: 15px;
+      box-shadow: 0px 6px 7px #999;
+    }
+    .bg img{
+      display: none;
+    }
+    .avatar{
+      margin-top: 3vw;
+      width: 18vw;
+      height: 18vw;
+      border: 4px solid #fff;
+      box-shadow: 0 0 25px 10px rgba(0,106,255,0.15);
+    }
+    .song-name{
+      font-size: 15px;
+    }
+    .singer{
+      font-size: 12px;
+    }
+    .progress-line{
+      width: 90%;
+    }
+    .time{
+      font-size: 12px;
+    }
+    .control-bar{
+      height: 8vw;
+    }
+    .loop-btn{
+      width: 4vw;
+      height: 4vw;
+      background-size: 3.5vw 3.5vw;
+      margin: 0 2vw 0 0;
+    }
+    .pre-btn{
+      width: 3.5vw;
+      height: 2vw;
+      background-size: cover;
+      margin: 0 0 1vw 0;
+    }
+    .pause-btn{
+      width: 5vw;
+      height: 5vw;
+      background-size: cover;
+      margin: 0 2vw;
+    }
+    .next-btn{
+      width: 3.5vw;
+      height: 2vw;
+      background-size: cover;
+      margin: 0 0 1vw 0;
+    }
+    .volume-btn{
+      width: 4vw;
+      height: 4vw;
+      background-size: 3.5vw 3.5vw;
+      margin: 0 0 0 2vw;
+    }
+    .goSearch{
+      display: none;
+    }
   }
 </style>

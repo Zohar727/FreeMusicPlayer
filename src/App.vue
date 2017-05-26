@@ -1,8 +1,11 @@
 <template>
   <div id="app">
     <!--<img src="./assets/logo.png">-->
-    <router-view></router-view>
-    <musicbox></musicbox>
+    <keep-alive>
+      <router-view></router-view>
+    </keep-alive>
+    <!--<musicbox></musicbox>-->
+
   </div>
 </template>
 
@@ -24,5 +27,10 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+@media screen and (min-width: 1000px) {
+  html {
+    background: #d2d5d6;
+  }
 }
 </style>

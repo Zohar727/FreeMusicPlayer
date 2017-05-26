@@ -12,7 +12,7 @@
           <li v-for="(song, index) in songs" class="songItem" >
             <p class="songName">{{song.name}}</p>
             <p class="singer">{{song.ar[0].name}}-{{song.al.name}}</p>
-            <span class="songPlay" :class="{'pause':pauseIndex == index}" @click.stop="listPlay(song,index,$event)"></span>
+            <span class="songPlay" :class="{'pause':pauseIndex == index}" @click.prevent="listPlay(song,index,$event)"></span>
           </li>
         </ul>
       </div>
@@ -25,7 +25,7 @@
     export default{
         data(){
             return{
-                showFlag:false,
+                showFlag:true,
                 name:"",
                 songs:[],
                 pauseIndex:-1
@@ -50,6 +50,7 @@
                 var result = music.result;
                 //var songs = result.songs;
                 this.songs = result.songs;
+                this.pauseIndex = -1;
                 console.log(this.songs[0].id);
                 //console.log("initscroll" + this.initScroll());
 
@@ -139,6 +140,11 @@
     border-bottom: 1px solid #fff;
     -webkit-appearance: none;
     border-radius: 0;
+
+  }
+  ::-webkit-input-placeholder{
+    color: #fff;
+    opacity: 0.7;
   }
   .songWrap{
     overflow: hidden;
@@ -190,5 +196,66 @@
     height: 144px;
     background: url("../assets/pause.png") no-repeat;
     transform: scale(0.5);
+  }
+  @media screen and (min-width: 1000px){
+    .search{
+      position: absolute;
+      right: 10px;
+      width: 55%;
+      height: 80vh;
+      margin: 60px 0 0 40%;
+      border-radius: 15px;
+      box-shadow: 0px 6px 7px #999;
+    }
+    .search-box{
+      height: 60px;
+      border-radius: 15px 15px 0 0;
+    }
+    .search-text{
+      margin-top: 10px;
+      height: 35px;
+      line-height: 35px;
+      font-size: 15px;
+    }
+    .songItem{
+      height: 40px;
+      margin:  5px 0px;
+      padding: 2px 0px;
+    }
+    .songName{
+      font-size: 14px;
+      margin-top: 0;
+      margin-bottom: 0px;
+    }
+    .singer{
+      font-size: 12px;
+    }
+    .songPlay{
+      top: -5px;
+      width: 52px;
+      height: 52px;
+      background-size: cover;
+      cursor: pointer;
+    }
+    .pause{
+      top: -5px;
+      bottom: 5px;
+      width: 52px;
+      height: 52px;
+      background-size: cover;
+    }
+    .back{
+      display: none;
+    }
+    .search-btn{
+      top: 15px;
+      width: 26px;
+      height: 26px;
+      background-size: cover;
+      cursor: pointer;
+    }
+    .songWrap{
+      top: 65px;
+    }
   }
 </style>
