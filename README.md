@@ -2,7 +2,7 @@
 > 使用 vue2.0+axios+webpack 开发的在线音乐播放器，歌曲资源来自云网易云音乐
 项目持续开发中
 ## 在线预览
-   [demo](e.zohar.com.cn/dist)
+   [demo](http://e.zohar.com.cn/dist)
    > PC端/移动端均已适配
 ## 短期计划
 - ~~基本界面~~
