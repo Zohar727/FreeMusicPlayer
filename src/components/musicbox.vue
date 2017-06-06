@@ -62,7 +62,8 @@
                   y:0
               },
               curProcess:0,
-              mouseFlag:false
+              mouseFlag:false,
+              autoState:1
           }
       },
       methods:{
@@ -135,6 +136,11 @@
                 console.log("点击暂停按钮了");
             }
           },
+//          autoPlay(){
+//            var audio = document.getElementById("audio");
+//            audio.play();
+//            this.state = 1;
+//          },
           preplay(){
             this.index--;
             this.switchplay(this.index);
@@ -184,11 +190,17 @@
              console.log(audio.currentTime);
              //console.log(audio.duration);
              this.currentTime(audio.currentTime,1);
-             if(scales==1){
+             if(scales==1 && this.autoState){
                  this.state = 0;
-                 this.index++;
-                 this.switchplay(this.index);
+                 this.autoState = 0;
+                 this.nextplay();
+
+//                 this.index++;
+//                 this.switchplay(this.index);
              }
+            setTimeout( ()=> {
+              this.autoState = 1;
+            },1000);
           },
           currentTime(time,state){
             let minute;
@@ -471,8 +483,10 @@
       background: #d2d5d6;
     }
     #musicbox{
-      width: 35%;
-      height:55%;
+      margin-top: -25px;
+      margin-left: 20px;
+      width: 27vw;
+      height:45vw;
       background-color: #fff;
       border-radius: 15px;
       box-shadow: 0px 6px 7px #999;
@@ -502,38 +516,59 @@
     .control-bar{
       height: 8vw;
     }
+    .progress-bar{
+      height: 40px;
+    }
+    .start-time{
+      top: 12px;
+      left: -26px;
+    }
+    .end-time{
+      position: absolute;
+      right: -26px;
+      top: 12px;
+    }
     .loop-btn{
-      width: 4vw;
-      height: 4vw;
-      background-size: 3.5vw 3.5vw;
-      margin: 0 2vw 0 0;
+      cursor: pointer;
+      width: 3vw;
+      height: 3vw;
+      background-size: 2vw 2vw;
+      margin: -1vw 0.7vw 0 0;
     }
     .pre-btn{
-      width: 3.5vw;
-      height: 2vw;
-      background-size: cover;
+      cursor: pointer;
+      width: 2.5vw;
+      height: 1.5vw;
+      background-size: 2.3vw 1.3vw;
       margin: 0 0 1vw 0;
     }
     .pause-btn{
-      width: 5vw;
-      height: 5vw;
+      cursor: pointer;
+      width: 3vw;
+      height: 3vw;
       background-size: cover;
-      margin: 0 2vw;
+      margin: 0 1vw;
     }
     .next-btn{
-      width: 3.5vw;
-      height: 2vw;
-      background-size: cover;
+      cursor: pointer;
+      width: 2.5vw;
+      height: 1.5vw;
+      background-size: 2.3vw 1.3vw;
       margin: 0 0 1vw 0;
     }
     .volume-btn{
-      width: 4vw;
-      height: 4vw;
-      background-size: 3.5vw 3.5vw;
-      margin: 0 0 0 2vw;
+      cursor: pointer;
+      width: 3vw;
+      height: 3vw;
+      background-size: 2vw 2vw;
+      margin: 1vw 0 0 1vw;
     }
     .goSearch{
-      display: none;
+      /*display: none;*/
+      width: 3vw;
+      height: 3vw;
+      background-size: cover;
+      cursor: pointer;
     }
   }
 </style>

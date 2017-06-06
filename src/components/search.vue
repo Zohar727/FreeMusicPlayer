@@ -4,7 +4,7 @@
       <div class="search-box">
         <span class="back" @click="hide"></span>
         <input type="text" v-model="name" ref="name" class="search-text" placeholder="搜索音乐">
-        <span @click="search" class="search-btn"></span>
+        <span @click="search(1)" class="search-btn"></span>
       </div>
       <!--<p>music name is : {{name}}</p>-->
       <div ref="songWrap" class="songWrap">
@@ -14,6 +14,7 @@
             <p class="singer">{{song.ar[0].name}}-{{song.al.name}}</p>
             <span class="songPlay" :class="{'pause':pauseIndex == index}" @click.prevent="listPlay(song,index,$event)"></span>
           </li>
+          <li class="load-more" @click.prevent="loadmore($event)">{{msg}}</li>
         </ul>
       </div>
     </div>
@@ -25,10 +26,13 @@
     export default{
         data(){
             return{
-                showFlag:true,
+                showFlag:false,
                 name:"",
                 songs:[],
-                pauseIndex:-1
+                pauseIndex:-1,
+                offset:1,
+                msg:"加载更多",
+                state:1
             }
         },
         methods:{
@@ -38,46 +42,90 @@
             hide(){
                 this.showFlag = false;
             },
-            search(){
+            search(from){
             //alert("click");
             //http://s.music.163.com/search/get/?type=1&limit=1&s=
             var name = this.name;
+            console.log(from);
+            if(from){
+              this.offset = 1;
+            }
+
+            var offset = this.offset;
             console.log(name);
-            axios.get('https://api.imjad.cn/cloudmusic/?type=search&limit=30&s='+name)
+            axios.get('https://api.imjad.cn/cloudmusic/?type=search&limit=20&s='+name+'&offset='+offset)
               .then( (response) => {
                 //console.log(response.data);
                 var music = JSON.parse(JSON.stringify(response.data));
                 var result = music.result;
                 //var songs = result.songs;
-                this.songs = result.songs;
+                if(offset == 1){
+                  this.songs = result.songs;
+                }else {
+                  this.songs = this.songs.concat(result.songs);
+                }
+
                 this.pauseIndex = -1;
                 console.log(this.songs[0].id);
                 //console.log("initscroll" + this.initScroll());
+                if(offset == 1){
+                  this.$nextTick(() => {
+                    console.log("nextTick");
+                    console.log(this.songs);
+                    this.initScroll();
+                  })
+                }else {
+                    this.$nextTick(() => {
+                        this.scroll.refresh();
+                    })
+                }
 
-                this.$nextTick(() => {
-                  console.log("nextTick");
-                  this.initScroll();
-                })
-
+                this.offset++;
               })
               .catch(function (error) {
                 console.log(error);
               });
           },
             initScroll(){
+                var self = this;
                 console.log("Bscroll is ok");
                 this.scroll =  new Bscroll(this.$refs.songWrap,{
                     click:true
-                })
+                });
+                this.scroll.on('touchend',function (position) {
+                  //console.log("position:"+position.y);
+                  //console.log("maxScrollY:"+this.maxScrollY);
+                  //self.msg = "加载中";
+                  if(position.y<this.maxScrollY){
+                      console.log("加载中");
+                    self.search(0);
+
+
+                  }
+                });
+            },
+            loadmore(event){
+              if(!event._constructed){
+                return;
+              }
+              this.search(0);
             },
             listPlay(song,index,event){
               if(!event._constructed){
                 return;
               }
                 console.log(song.id);
+                console.log("this.state:"+this.state);
                 var songs = this.songs;
                 this.pauseIndex = index;
-                this.$emit('search',song,index,songs);
+                if(this.state){
+                  this.$emit('search',song,index,songs);
+                  this.state = 0;
+                }
+                setTimeout(()=> {
+                  this.state = 1;
+                },1000);
+
             }
         }
     }
@@ -148,7 +196,7 @@
   }
   .songWrap{
     overflow: hidden;
-    position: fixed;
+    position: absolute;
     top: 110px;
     left: 0px;
     right: 0px;
@@ -197,13 +245,17 @@
     background: url("../assets/pause.png") no-repeat;
     transform: scale(0.5);
   }
+  .load-more{
+    font-size: 25px;
+    list-style-type: none;
+  }
   @media screen and (min-width: 1000px){
     .search{
       position: absolute;
       right: 10px;
       width: 55%;
       height: 80vh;
-      margin: 60px 0 0 40%;
+      margin: 35px 0 0 40%;
       border-radius: 15px;
       box-shadow: 0px 6px 7px #999;
     }
@@ -245,7 +297,12 @@
       background-size: cover;
     }
     .back{
-      display: none;
+      /*display: none;*/
+      top: 18px;
+      width: 30px;
+      height: 30px;
+      background-size: cover;
+      cursor: pointer;
     }
     .search-btn{
       top: 15px;
@@ -256,6 +313,12 @@
     }
     .songWrap{
       top: 65px;
+    }
+    .load-more{
+      height: 20px;
+      line-height: 20px;
+      font-size: 15px;
+      cursor: pointer;
     }
   }
 </style>
