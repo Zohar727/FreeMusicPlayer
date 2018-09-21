@@ -26,307 +26,227 @@
       <div class="bg">
         <img src="../assets/bg.png">
       </div>
-      <!--<div class="hide" style="display: none">-->
-        <!--<P>hello musicbox!!!!!</P>-->
-        <!--<input type="text" v-model="name" ref="name">-->
-        <!--<p>music name is : {{name}}</p>-->
-        <!--<button @click="search">搜索</button>-->
-        <!--<button @click="play">播放</button>-->
-        <!--<ul>-->
-          <!--<li v-for="song in songs">{{song.id}}</li>-->
-        <!--</ul>-->
-        <!--<input v-model="message" placeholder="edit me">-->
-        <!--<p>Message is: {{ message }}</p>-->
-      <!--</div>-->
       <search ref="goSearch" @search="search"></search>
     </div>
 </template>
 <script>
-  import axios from 'axios';
-  import search from './search';
-
-    export default{
-      data(){
-          return{
-              name:"",
-              message:"",
-              songs:Object,
-              songsList:[],
-              songUrl:"",
-              startTime:"00:00",
-              time:"05:28",
-              state:0,
-              index:0,
-              originPos:{
-                  x:0,
-                  y:0
-              },
-              curProcess:0,
-              mouseFlag:false,
-              autoState:1
-          }
+import axios from 'axios'
+import search from './search'
+export default{
+  data () {
+    return {
+      name: '',
+      message: '',
+      songs: Object,
+      songsList: [],
+      songUrl: '',
+      startTime: '00:00',
+      time: '05:28',
+      state: 0,
+      index: 0,
+      originPos: {
+        x: 0,
+        y: 0
       },
-      methods:{
-          search(song,index,songs){
-            var self = this;
-            this.songs = song;
-            this.index = index;
-            this.songsList = songs;
-            console.log("传过来的song:"+song+song.name+song.ar[0].name+song.al.picUrl);
-            console.log("传过来的id："+song.id);
-            console.log("传过来的index:"+index);
-            console.log("传过来的songs:"+songs.length);
-            axios.get('https://api.imjad.cn/cloudmusic/?id='+song.id)
-              .then( (response) => {
-                var songItem = JSON.parse(JSON.stringify(response.data));
-                var url = songItem.data[0].url;
-                console.log(url);
-                this.songUrl = url;
-                setTimeout(function () {
-                  var time = document.getElementById("audio").duration;
-                  //this.methods.controlBar(time);
-                  console.log(time);
-                  self.currentTime(time,0);
-//                  var audio = document.getElementById("audio");
-//                  audio.play();
-                  self.play();
-                },500);
-              })
-              .catch(function (error) {
-                console.log(error);
-              });
-
-              //alert("click");
-              //http://s.music.163.com/search/get/?type=1&limit=1&s=
-//            var name = this.name;
-//            console.log(name);
-//              axios.get('https://api.imjad.cn/cloudmusic/?type=search&limit=10&s='+name)
-//                .then( (response) => {
-//                    //console.log(response.data);
-//                    var music = JSON.parse(JSON.stringify(response.data));
-//                    var result = music.result;
-//                    //var songs = result.songs;
-//                    this.songs = result.songs;
-//                    console.log(this.songs[0].id);
-//
-//                })
-//                .catch(function (error) {
-//                    console.log(error);
-//                });
-          },
-          play(){
-            var audio = document.getElementById("audio");
-            var progress = document.getElementById("progress-line");
-            var line = document.getElementById("line");
-            //var pause_btn = document.getElementById("pause-btn");
-//            audio.addEventListener("timeupdate",function () {
-//              console.log("test");
-//              var scales = audio.currentTime/audio.duration;
-//              line.style.width = progress.offsetWidth * scales +'px';
-//            });
-            if(audio.paused){
-                audio.play();
-                //this.style.background="url(../assets/pause.png) no-repeat"
-                console.log("点击播放按钮了");
-                this.state = 1;
-            }else {
-                audio.pause();
-                //this.style.background="url(../assets/play.png) no-repeat"
-                this.state = 0;
-                console.log("点击暂停按钮了");
-            }
-          },
-//          autoPlay(){
-//            var audio = document.getElementById("audio");
-//            audio.play();
-//            this.state = 1;
-//          },
-          preplay(){
-            this.index--;
-            this.switchplay(this.index);
-          },
-          nextplay(){
-            this.index++;
-            this.switchplay(this.index);
-          },
-          switchplay(index){
-              //this.index++;
-              //var index = this.index;
-              var self = this;
-              this.songs = this.songsList[index];
-              axios.get('https://api.imjad.cn/cloudmusic/?id='+this.songsList[index].id)
-                .then( (response) => {
-                  var songItem = JSON.parse(JSON.stringify(response.data));
-                  var url = songItem.data[0].url;
-                  console.log(url);
-                  this.songUrl = url;
-                  setTimeout(function () {
-                    var audio = document.getElementById("audio");
-
-                    audio.addEventListener('canplay',function () {
-                      var time = audio.duration;
-                      console.log("canplay");
-                      self.currentTime(time,0);
-                    })
-                    //this.methods.controlBar(time);
-                    console.log(time);
-
-//                  var audio = document.getElementById("audio");
-//                  audio.play();
-                    self.play();
-                  },500);
-                })
-                .catch(function (error) {
-                  console.log(error);
-                });
-          },
-          timeline(){
-            var audio = document.getElementById("audio");
-            var scales = audio.currentTime/audio.duration;
-            //console.log(this.$refs.progress.offsetWidth);
-            this.$refs.line.style.width = this.$refs.progress.offsetWidth * scales +'px';
-            this.$refs.lineSlider.style.left = this.$refs.progress.offsetWidth * scales  +'px';
-              //console.log(el);
-             console.log(audio.currentTime);
-             //console.log(audio.duration);
-             this.currentTime(audio.currentTime,1);
-             if(scales==1 && this.autoState){
-                 this.state = 0;
-                 this.autoState = 0;
-                 this.nextplay();
-
-//                 this.index++;
-//                 this.switchplay(this.index);
-             }
-            setTimeout( ()=> {
-              this.autoState = 1;
-            },1000);
-          },
-          currentTime(time,state){
-            let minute;
-            let second;
-            time = Math.round(time);
-            console.log(time);
-            minute = Math.floor(time/60);
-            second = time - minute*60;
-            console.log("0"+minute+":"+second);
-            if(state){
-              if(second<10){
-                this.startTime="0"+minute+":0"+second;
-              }else {
-                this.startTime="0"+minute+":"+second;
-              }
-            }else {
-              if(second<10){
-                this.time="0"+minute+":0"+second;
-              }else {
-                this.time="0"+minute+":"+second;
-              }
-            }
-
-
-          },
-          touchdown(){
-            this.mouseFlag = true;
-            var touch;
-            if(event.touches){
-              touch = event.touches[0];
-            }else {
-              touch = event;
-            }
-            this.originPos.x = touch.clientX;
-            this.originPos.y = touch.clientY;
-            console.log("curX:"+this.originPos.x+",curY:"+this.originPos.x);
-          },
-          touchmove(){
-            if(this.mouseFlag){
-            var touch;
-            if(event.touches){
-              touch = event.touches[0];
-            }else {
-              touch = event;
-            }
-            var curleft = touch.clientX - this.$refs.progress.offsetLeft-this.$refs.progressBar.offsetLeft;
-            console.log("progress:"+this.$refs.progress.clientLeft);
-            //var curleft = this.$refs.lineSlider.style.left.toString();
-            //console.log("left:"+curleft);
-            //console.log(event.touches[0].clientX,event.touches[0].clientY);
-            if(curleft>0 && curleft<650){
-              this.curProcess  = curleft;
-              this.$refs.lineSlider.style.left = curleft + 'px';
-            }
-            //阻止页面的滑动默认事件
-            document.addEventListener("touchmove",function(){
-              event.preventDefault();
-            },false);
-            }
-          },
-          touchend(){
-              this.mouseFlag = false;
-              var audio = document.getElementById("audio");
-              var scales = this.curProcess / this.$refs.progress.offsetWidth ;
-              console.log("scales:"+scales);
-              audio.currentTime = audio.duration * scales;
-              if(!audio.paused)
-                  audio.play();
-
-          },
-          goSearch(){
-              console.log("goSearch>>")
-              this.$refs.goSearch.show();
-          }
-      },
-      computed:{
-
-      },
-      created(){
-        axios.get('https://api.imjad.cn/cloudmusic/?type=search&limit=1&s=成都')
-          .then( (response) => {
-            //console.log(response.data);
-            var music = JSON.parse(JSON.stringify(response.data));
-            var result = music.result;
-            //var songs = result.songs;
-            this.songs = result.songs[0];
-            console.log(this.songs.id);
-            var id = this.songs.id;
-            axios.get('https://api.imjad.cn/cloudmusic/?id='+id)
-              .then( (response) => {
-                var songItem = JSON.parse(JSON.stringify(response.data));
-                var url = songItem.data[0].url;
-                console.log(url);
-                this.songUrl = url;
-                setTimeout(function () {
-                  var time = document.getElementById("audio").duration;
-                  //this.methods.controlBar(time);
-                  console.log(time);
-                  this.time = time;
-                },500);
-
-              })
-              .catch(function (error) {
-                console.log(error);
-              });
+      curProcess: 0,
+      mouseFlag: false,
+      autoState: 1
+    }
+  },
+  methods: {
+    search (song, index, songs) {
+      var self = this
+      this.songs = song
+      this.index = index
+      this.songsList = songs
+      console.log('传过来的song:' + song + song.name + song.ar[0].name + song.al.picUrl)
+      console.log('传过来的id：' + song.id)
+      console.log('传过来的index:' + index)
+      console.log('传过来的songs:' + songs.length)
+      axios.get('https://api.imjad.cn/cloudmusic/?id=' + song.id)
+        .then((response) => {
+          var songItem = JSON.parse(JSON.stringify(response.data))
+          var url = songItem.data[0].url
+          console.log(url)
+          this.songUrl = url
+          setTimeout(function () {
+            var time = document.getElementById('audio').duration
+            console.log(time)
+            self.currentTime(time, 0)
+            self.play()
+          }, 500)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    play () {
+      var audio = document.getElementById('audio')
+      // var progress = document.getElementById('progress-line')
+      // var line = document.getElementById('line')
+      if (audio.paused) {
+        audio.play()
+        console.log('点击播放按钮了')
+        this.state = 1
+      } else {
+        audio.pause()
+        this.state = 0
+        console.log('点击暂停按钮了')
+      }
+    },
+    preplay () {
+      this.index--
+      this.switchplay(this.index)
+    },
+    nextplay () {
+      this.index++
+      this.switchplay(this.index)
+    },
+    switchplay (index) {
+      var self = this
+      this.songs = this.songsList[index]
+      axios.get('https://api.imjad.cn/cloudmusic/?id=' + this.songsList[index].id)
+        .then((response) => {
+          var songItem = JSON.parse(JSON.stringify(response.data))
+          var url = songItem.data[0].url
+          console.log(url)
+          this.songUrl = url
+          setTimeout(function () {
+            var audio = document.getElementById('audio')
+            audio.addEventListener('canplay', function () {
+              var time = audio.duration
+              console.log('canplay')
+              self.currentTime(time, 0)
+            })
+            self.play()
+          }, 500)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    timeline () {
+      var audio = document.getElementById('audio')
+      var scales = audio.currentTime / audio.duration
+      this.$refs.line.style.width = this.$refs.progress.offsetWidth * scales + 'px'
+      this.$refs.lineSlider.style.left = this.$refs.progress.offsetWidth * scales + 'px'
+      console.log(audio.currentTime)
+      this.currentTime(audio.currentTime, 1)
+      if (scales === 1 && this.autoState) {
+        this.state = 0
+        this.autoState = 0
+        this.nextplay()
+      }
+      setTimeout(() => {
+        this.autoState = 1
+      }, 1000)
+    },
+    currentTime (time, state) {
+      let minute
+      let second
+      time = Math.round(time)
+      console.log(time)
+      minute = Math.floor(time / 60)
+      second = time - minute * 60
+      console.log('0' + minute + ':' + second)
+      if (state) {
+        if (second < 10) {
+          this.startTime = '0' + minute + ':0' + second
+        } else {
+          this.startTime = '0' + minute + ':' + second
+        }
+      } else {
+        if (second < 10) {
+          this.time = '0' + minute + ':0' + second
+        } else {
+          this.time = '0' + minute + ':' + second
+        }
+      }
+    },
+    touchdown () {
+      this.mouseFlag = true
+      var touch
+      if (event.touches) {
+        touch = event.touches[0]
+      } else {
+        touch = event
+      }
+      this.originPos.x = touch.clientX
+      this.originPos.y = touch.clientY
+      console.log('curX:' + this.originPos.x + ',curY:' + this.originPos.x)
+    },
+    touchmove () {
+      if (this.mouseFlag) {
+        var touch
+        if (event.touches) {
+          touch = event.touches[0]
+        } else {
+          touch = event
+        }
+        var curleft = touch.clientX - this.$refs.progress.offsetLeft - this.$refs.progressBar.offsetLeft
+        console.log('progress:' + this.$refs.progress.clientLeft)
+        if (curleft > 0 && curleft < 650) {
+          this.curProcess = curleft
+          this.$refs.lineSlider.style.left = curleft + 'px'
+        }
+        // 阻止页面的滑动默认事件
+        document.addEventListener('touchmove', function () {
+          event.preventDefault()
+        }, false)
+      }
+    },
+    touchend () {
+      this.mouseFlag = false
+      var audio = document.getElementById('audio')
+      var scales = this.curProcess / this.$refs.progress.offsetWidth
+      console.log('scales:' + scales)
+      audio.currentTime = audio.duration * scales
+      if (!audio.paused) {
+        audio.play()
+      }
+    },
+    goSearch () {
+      console.log('goSearch>>')
+      this.$refs.goSearch.show()
+    }
+  },
+  computed: {
+  },
+  created () {
+    axios.get('https://api.imjad.cn/cloudmusic/?type=search&limit=1&s=成都')
+      .then((response) => {
+        var music = JSON.parse(JSON.stringify(response.data))
+        var result = music.result
+        this.songs = result.songs[0]
+        console.log(this.songs.id)
+        var id = this.songs.id
+        axios.get('https://api.imjad.cn/cloudmusic/?id=' + id)
+          .then((response) => {
+            var songItem = JSON.parse(JSON.stringify(response.data))
+            var url = songItem.data[0].url
+            console.log(url)
+            this.songUrl = url
+            setTimeout(function () {
+              var time = document.getElementById('audio').duration
+              console.log(time)
+              this.time = time
+            }, 500)
           })
           .catch(function (error) {
-            console.log(error);
-          });
-
-
-      },
-      mounted(){
-        console.log("ready");
-//        this.$nextTick( function () {
-//          var audio = document.getElementById("audio");
-//          audio.addEventListener("timeupdate",function () {
-//            console.log("test");
-//          });
-//        })
-
-      },
-      components:{
-          search
-      }
-    }
+            console.log(error)
+          })
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+  },
+  mounted () {
+    console.log('ready')
+  },
+  components: {
+    search
+  }
+}
 </script>
 <style scoped>
   .musicbox{

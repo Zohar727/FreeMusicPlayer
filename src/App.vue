@@ -12,10 +12,10 @@
 <script>
   import musicbox from './components/musicbox'
 export default {
-  name: 'app',
-  components:{
-      'musicbox':musicbox
-  }
+    name: 'app',
+    components: {
+      'musicbox': musicbox
+    }
 }
 </script>
 

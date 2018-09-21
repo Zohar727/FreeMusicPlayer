@@ -21,114 +21,100 @@
   </transition>
 </template>
 <script>
-  import axios from 'axios';
-  import Bscroll from 'better-scroll';
-    export default{
-        data(){
-            return{
-                showFlag:false,
-                name:"",
-                songs:[],
-                pauseIndex:-1,
-                offset:1,
-                msg:"加载更多",
-                state:1
-            }
-        },
-        methods:{
-            show(){
-                this.showFlag = true;
-            },
-            hide(){
-                this.showFlag = false;
-            },
-            search(from){
-            //alert("click");
-            //http://s.music.163.com/search/get/?type=1&limit=1&s=
-            var name = this.name;
-            console.log(from);
-            if(from){
-              this.offset = 1;
-            }
-
-            var offset = this.offset;
-            console.log(name);
-            axios.get('https://api.imjad.cn/cloudmusic/?type=search&limit=20&s='+name+'&offset='+offset)
-              .then( (response) => {
-                //console.log(response.data);
-                var music = JSON.parse(JSON.stringify(response.data));
-                var result = music.result;
-                //var songs = result.songs;
-                if(offset == 1){
-                  this.songs = result.songs;
-                }else {
-                  this.songs = this.songs.concat(result.songs);
-                }
-
-                this.pauseIndex = -1;
-                console.log(this.songs[0].id);
-                //console.log("initscroll" + this.initScroll());
-                if(offset == 1){
-                  this.$nextTick(() => {
-                    console.log("nextTick");
-                    console.log(this.songs);
-                    this.initScroll();
-                  })
-                }else {
-                    this.$nextTick(() => {
-                        this.scroll.refresh();
-                    })
-                }
-
-                this.offset++;
-              })
-              .catch(function (error) {
-                console.log(error);
-              });
-          },
-            initScroll(){
-                var self = this;
-                console.log("Bscroll is ok");
-                this.scroll =  new Bscroll(this.$refs.songWrap,{
-                    click:true
-                });
-                this.scroll.on('touchend',function (position) {
-                  //console.log("position:"+position.y);
-                  //console.log("maxScrollY:"+this.maxScrollY);
-                  //self.msg = "加载中";
-                  if(position.y<this.maxScrollY){
-                      console.log("加载中");
-                    self.search(0);
-
-
-                  }
-                });
-            },
-            loadmore(event){
-              if(!event._constructed){
-                return;
-              }
-              this.search(0);
-            },
-            listPlay(song,index,event){
-              if(!event._constructed){
-                return;
-              }
-                console.log(song.id);
-                console.log("this.state:"+this.state);
-                var songs = this.songs;
-                this.pauseIndex = index;
-                if(this.state){
-                  this.$emit('search',song,index,songs);
-                  this.state = 0;
-                }
-                setTimeout(()=> {
-                  this.state = 1;
-                },1000);
-
-            }
-        }
+import axios from 'axios'
+import Bscroll from 'better-scroll'
+export default{
+  data () {
+    return {
+      showFlag: false,
+      name: '',
+      songs: [],
+      pauseIndex: -1,
+      offset: 1,
+      msg: '加载更多',
+      state: 1
     }
+  },
+  methods: {
+    show () {
+      this.showFlag = true
+    },
+    hide () {
+      this.showFlag = false
+    },
+    search (from) {
+      var name = this.name
+      console.log(from)
+      if (from) {
+        this.offset = 1
+      }
+      var offset = this.offset
+      console.log(name)
+      axios.get('https://api.imjad.cn/cloudmusic/?type=search&limit=20&s=' + name + '&offset=' + offset)
+        .then((response) => {
+          var music = JSON.parse(JSON.stringify(response.data))
+          var result = music.result
+          if (offset === 1) {
+            this.songs = result.songs
+          } else {
+            this.songs = this.songs.concat(result.songs)
+          }
+          this.pauseIndex = -1
+          console.log(this.songs[0].id)
+          if (offset === 1) {
+            this.$nextTick(() => {
+              console.log('nextTick')
+              console.log(this.songs)
+              this.initScroll()
+            })
+          } else {
+            this.$nextTick(() => {
+              this.scroll.refresh()
+            })
+          }
+          this.offset++
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    initScroll () {
+      var self = this
+      console.log('Bscroll is ok')
+      this.scroll = new Bscroll(this.$refs.songWrap, {
+        click: true
+      })
+      this.scroll.on('touchend', function (position) {
+        if (position.y < this.maxScrollY) {
+          console.log('加载中')
+          self.search(0)
+        }
+      })
+    },
+    loadmore (event) {
+      if (!event._constructed) {
+        return
+      }
+      this.search(0)
+    },
+    listPlay (song, index, event) {
+      if (!event._constructed) {
+        return
+      }
+      console.log(song.id)
+      console.log('this.state:' + this.state)
+      var songs = this.songs
+      this.pauseIndex = index
+      if (this.state) {
+        this.$emit('search', song, index, songs)
+        this.state = 0
+      }
+      setTimeout(() => {
+        this.state = 1
+      }, 1000)
+    }
+  }
+}
 </script>
 <style scoped>
   p{
