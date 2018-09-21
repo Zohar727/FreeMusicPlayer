@@ -82,8 +82,6 @@ export default{
     },
     play () {
       var audio = document.getElementById('audio')
-      // var progress = document.getElementById('progress-line')
-      // var line = document.getElementById('line')
       if (audio.paused) {
         audio.play()
         console.log('点击播放按钮了')
@@ -272,9 +270,9 @@ export default{
     animation:rotaion 18s linear infinite;
     -webkit-animation: rotation 18s linear infinite;
   }
-  @-webkit-keyframes rotation{
-    from {-webkit-transform: rotate(0deg);}
-    to {-webkit-transform: rotate(360deg);}
+  @keyframes rotation{
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
   }
   .song-name{
     margin-top: 0px;
